@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <DirBase>$(ProjectDir)../../../</DirBase>
+    <DirBin>$(DirBase)bin/msvc/$(Platform)/$(Configuration)/</DirBin>
+    <DirInclude>$(DirBase)inc/</DirInclude>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LibraryPath>$(DirBin);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(DirInclude);$(IncludePath)</IncludePath>
+    <OutDir>$(DirBin)</OutDir>
+    <IntDir>$(DirBin)/$(ProjectName)/</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="DirBase">
+      <Value>$(DirBase)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DirBin">
+      <Value>$(DirBin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DirInclude">
+      <Value>$(DirInclude)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
