@@ -5,10 +5,11 @@
     <DirBase>$(ProjectDir)../../../</DirBase>
     <DirBin>$(DirBase)bin/msvc/$(Platform)/$(Configuration)/</DirBin>
     <DirInclude>$(DirBase)inc/</DirInclude>
+    <DirExt>$(DirBase)ext/</DirExt>
   </PropertyGroup>
   <PropertyGroup>
     <LibraryPath>$(DirBin);$(LibraryPath)</LibraryPath>
-    <IncludePath>$(DirInclude);$(IncludePath)</IncludePath>
+    <IncludePath>$(DirInclude);$(DirExt);$(IncludePath)</IncludePath>
     <OutDir>$(DirBin)</OutDir>
     <IntDir>$(DirBin)/$(ProjectName)/</IntDir>
     <LinkIncremental>false</LinkIncremental>
@@ -22,7 +23,7 @@
     <ClCompile>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WINNT;SAL_SUPP_H;SPECSTRING_SUPP_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
@@ -38,6 +39,9 @@
     </BuildMacro>
     <BuildMacro Include="DirInclude">
       <Value>$(DirInclude)</Value>
+    </BuildMacro>
+    <BuildMacro Include="DirExt">
+      <Value>$(DirExt)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>
