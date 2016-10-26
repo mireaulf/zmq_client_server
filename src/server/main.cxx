@@ -14,10 +14,13 @@ int main(int argc, char** argv) {
             while(!stop) {
                 zmq::message_t message;
                 sock.recv(&message);
-                auto str = message.data<char>();
-                std::cout << "received: " << str << std::endl;
+                std::string str(message.data<char>());
+                if(str == "quit") {
+                    std::cout << "client disconnected." << std::endl;
+                } else {
+                    std::cout << "received: " << str << std::endl;
+                }
                 sock.send("ok", 3);
-                stop = str[0] == 'q';
             }
             std::cout << "SHUT DOWN." << std::endl;
         } else if(type == 'c') {
@@ -26,10 +29,21 @@ int main(int argc, char** argv) {
             sock.connect(argv[2]);
             if(sock.connected()) {
                 std::cout << "connected." << std::endl;
-                std::string str(argv[3]);
-                //size_t str_size = str.length() + 1;
-                zmq::message_t hello(str.c_str(), str.length() + 1);
-                sock.send(hello);
+                bool stop = false;
+                std::string line;
+                do {
+                    std::cin >> line;
+                    stop = line == "quit";
+                    if(stop) {
+                        std::cout << "quitting." << std::endl;
+                        line = "quitting";
+                    }
+                    std::cout << "sent: '" << line << "'" << std::endl;
+                    zmq::message_t message(line.c_str(), line.length() + 1);
+                    sock.send(message);
+                    zmq::message_t rcv;
+                    sock.recv(&rcv);
+                } while(!stop);
             }
         } else {
             std::cout << "unknown" << std::endl;
