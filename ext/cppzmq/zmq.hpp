@@ -1,25 +1,25 @@
 /*
-    Copyright (c) 2009-2011 250bpm s.r.o.
-    Copyright (c) 2011 Botond Ballo
-    Copyright (c) 2007-2009 iMatix Corporation
+Copyright (c) 2009-2011 250bpm s.r.o.
+Copyright (c) 2011 Botond Ballo
+Copyright (c) 2007-2009 iMatix Corporation
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to
-    deal in the Software without restriction, including without limitation the
-    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-    sell copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-    IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
 */
 
 #ifndef __ZMQ_HPP_INCLUDED__
@@ -30,9 +30,9 @@
 #define ZMQ_NOTHROW noexcept
 #define ZMQ_EXPLICIT explicit
 #else
-    #define ZMQ_CPP03
-    #define ZMQ_NOTHROW
-    #define ZMQ_EXPLICIT
+#define ZMQ_CPP03
+#define ZMQ_NOTHROW
+#define ZMQ_EXPLICIT
 #endif
 
 #include <zmq.h>
@@ -54,23 +54,23 @@
 #if (defined(__GNUC__) && (__GNUC__ > 4 || \
       (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) && \
       defined(__GXX_EXPERIMENTAL_CXX0X__))
-    #define ZMQ_HAS_RVALUE_REFS
-    #define ZMQ_DELETED_FUNCTION = delete
+#define ZMQ_HAS_RVALUE_REFS
+#define ZMQ_DELETED_FUNCTION = delete
 #elif defined(__clang__)
-    #if __has_feature(cxx_rvalue_references)
-        #define ZMQ_HAS_RVALUE_REFS
-    #endif
+#if __has_feature(cxx_rvalue_references)
+#define ZMQ_HAS_RVALUE_REFS
+#endif
 
-    #if __has_feature(cxx_deleted_functions)
-        #define ZMQ_DELETED_FUNCTION = delete
-    #else
-        #define ZMQ_DELETED_FUNCTION
-    #endif
-#elif defined(_MSC_VER) && (_MSC_VER >= 1600)
-    #define ZMQ_HAS_RVALUE_REFS
-    #define ZMQ_DELETED_FUNCTION
+#if __has_feature(cxx_deleted_functions)
+#define ZMQ_DELETED_FUNCTION = delete
 #else
-    #define ZMQ_DELETED_FUNCTION
+#define ZMQ_DELETED_FUNCTION
+#endif
+#elif defined(_MSC_VER) && (_MSC_VER >= 1600)
+#define ZMQ_HAS_RVALUE_REFS
+#define ZMQ_DELETED_FUNCTION
+#else
+#define ZMQ_DELETED_FUNCTION
 #endif
 
 #if ZMQ_VERSION >= ZMQ_MAKE_VERSION(3, 3, 0)
@@ -140,24 +140,22 @@ namespace zmq
         return poll(items, nitems, -1);
     }
 
-    #ifdef ZMQ_CPP11
+#ifdef ZMQ_CPP11
     inline int poll(zmq_pollitem_t const* items, size_t nitems, std::chrono::milliseconds timeout)
     {
-        #pragma warning (disable:4244)
-        return poll(items, nitems, timeout.count() );
+        return poll(items, nitems, static_cast<long>(timeout.count()));
     }
 
     inline int poll(std::vector<zmq_pollitem_t> const& items, std::chrono::milliseconds timeout)
     {
-        #pragma warning (disable:4244)
-        return poll(items.data(), items.size(), timeout.count() );
+        return poll(items.data(), items.size(), static_cast<long>(timeout.count()));
     }
 
     inline int poll(std::vector<zmq_pollitem_t> const& items, long timeout_ = -1)
     {
         return poll(items.data(), items.size(), timeout_);
     }
-    #endif
+#endif
 
 
 
@@ -167,7 +165,7 @@ namespace zmq
         if (rc != 0)
             throw error_t ();
     }
-    
+
 #ifdef ZMQ_HAS_PROXY_STEERABLE
     inline void proxy_steerable (void *frontend, void *backend, void *capture, void *control)
     {
@@ -176,20 +174,20 @@ namespace zmq
             throw error_t ();
     }
 #endif
-    
+
     inline void version (int *major_, int *minor_, int *patch_)
     {
         zmq_version (major_, minor_, patch_);
     }
 
-    #ifdef ZMQ_CPP11
+#ifdef ZMQ_CPP11
     inline std::tuple<int, int, int> version()
     {
         std::tuple<int, int, int> v;
         zmq_version(&std::get<0>(v), &std::get<1>(v), &std::get<2>(v) );
         return v;
     }
-    #endif
+#endif
 
     class message_t
     {
@@ -353,6 +351,14 @@ namespace zmq
             return static_cast<T const*>( data() );
         }
 
+        inline bool equal(const message_t* other) const ZMQ_NOTHROW
+        {
+            if (size() != other->size())
+                return false;
+            std::string a(data<char>(), size());
+            std::string b(other->data<char>(), other->size());
+            return a == b;
+        }
 
     private:
         //  The underlying message
@@ -404,14 +410,17 @@ namespace zmq
 
         inline ~context_t () ZMQ_NOTHROW
         {
-            int rc = zmq_ctx_destroy (ptr);
-            ZMQ_ASSERT (rc == 0);
+            close();
         }
 
         inline void close() ZMQ_NOTHROW
         {
+            if (ptr == NULL)
+                return;
+
             int rc = zmq_ctx_destroy (ptr);
             ZMQ_ASSERT (rc == 0);
+            ptr = NULL;
         }
 
         //  Be careful with this, it's probably only useful for
@@ -434,7 +443,7 @@ namespace zmq
         void operator = (const context_t&) ZMQ_DELETED_FUNCTION;
     };
 
-    #ifdef ZMQ_CPP11
+#ifdef ZMQ_CPP11
     enum class socket_type: int
     {
         req = ZMQ_REQ,
@@ -454,7 +463,7 @@ namespace zmq
         stream = ZMQ_STREAM
 #endif
     };
-    #endif
+#endif
 
     class socket_t
     {
@@ -465,12 +474,12 @@ namespace zmq
             init(context_, type_);
         }
 
-        #ifdef ZMQ_CPP11
+#ifdef ZMQ_CPP11
         inline socket_t(context_t& context_, socket_type type_)
         {
             init(context_, static_cast<int>(type_));
         }
-        #endif
+#endif
 
 #ifdef ZMQ_HAS_RVALUE_REFS
         inline socket_t(socket_t&& rhs) ZMQ_NOTHROW : ptr(rhs.ptr)
@@ -489,12 +498,12 @@ namespace zmq
             close();
         }
 
-        inline ZMQ_EXPLICIT operator void* () ZMQ_NOTHROW
+        inline operator void* () ZMQ_NOTHROW
         {
             return ptr;
         }
 
-        inline ZMQ_EXPLICIT operator void const* () const ZMQ_NOTHROW
+        inline operator void const* () const ZMQ_NOTHROW
         {
             return ptr;
         }
@@ -590,7 +599,7 @@ namespace zmq
         {
             return(ptr != NULL);
         }
-        
+
         inline size_t send (const void *buf_, size_t len_, int flags_ = 0)
         {
             int nbytes = zmq_send (ptr, buf_, len_, flags_);
@@ -643,7 +652,7 @@ namespace zmq
                 return false;
             throw error_t ();
         }
-        
+
     private:
         inline void init(context_t& context_, int type_)
         {
@@ -683,9 +692,9 @@ namespace zmq
 
             rc = zmq_connect (s, addr_);
             assert (rc == 0);
-            
+
             on_monitor_started();
-            
+
             while (true) {
                 zmq_msg_t eventMsg;
                 zmq_msg_init (&eventMsg);
@@ -702,7 +711,7 @@ namespace zmq
 #else
                 zmq_event_t* event = static_cast<zmq_event_t*>(zmq_msg_data(&eventMsg));
 #endif
-                
+
 #ifdef ZMQ_NEW_MONITOR_EVENT_LAYOUT
                 zmq_msg_t addrMsg;
                 zmq_msg_init (&addrMsg);
@@ -724,39 +733,39 @@ namespace zmq
 #endif
 
                 switch (event->event) {
-                case ZMQ_EVENT_CONNECTED:
-                    on_event_connected(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_CONNECT_DELAYED:
-                    on_event_connect_delayed(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_CONNECT_RETRIED:
-                    on_event_connect_retried(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_LISTENING:
-                    on_event_listening(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_BIND_FAILED:
-                    on_event_bind_failed(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_ACCEPTED:
-                    on_event_accepted(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_ACCEPT_FAILED:
-                    on_event_accept_failed(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_CLOSED:
-                    on_event_closed(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_CLOSE_FAILED:
-                    on_event_close_failed(*event, address.c_str());
-                    break;
-                case ZMQ_EVENT_DISCONNECTED:
-                    on_event_disconnected(*event, address.c_str());
-                    break;
-                default:
-                    on_event_unknown(*event, address.c_str());
-                    break;
+                    case ZMQ_EVENT_CONNECTED:
+                        on_event_connected(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_CONNECT_DELAYED:
+                        on_event_connect_delayed(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_CONNECT_RETRIED:
+                        on_event_connect_retried(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_LISTENING:
+                        on_event_listening(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_BIND_FAILED:
+                        on_event_bind_failed(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_ACCEPTED:
+                        on_event_accepted(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_ACCEPT_FAILED:
+                        on_event_accept_failed(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_CLOSED:
+                        on_event_closed(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_CLOSE_FAILED:
+                        on_event_close_failed(*event, address.c_str());
+                        break;
+                    case ZMQ_EVENT_DISCONNECTED:
+                        on_event_disconnected(*event, address.c_str());
+                        break;
+                    default:
+                        on_event_unknown(*event, address.c_str());
+                        break;
                 }
                 zmq_msg_close (&eventMsg);
             }
