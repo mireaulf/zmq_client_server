@@ -1,0 +1,3 @@
+[submodule "ext/cpperomq"]
+	path = ext/cpperomq
+	url = https://github.com/jship/CpperoMQ.git
