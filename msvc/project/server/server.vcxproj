@@ -82,7 +82,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(DirExt)zeromq-4.1.4/include/;$(IncludePath)</IncludePath>
+    <IncludePath>$(DirExt)zeromq-4.1.4/include/;$(DirExt)cpperomq\include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
